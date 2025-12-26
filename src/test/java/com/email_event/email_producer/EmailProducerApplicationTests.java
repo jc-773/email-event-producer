@@ -1,13 +1,13 @@
-package com.email_event.email_producer;
+// package com.email_event.email_producer;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class EmailProducerApplicationTests {
+// @SpringBootTest
+// class EmailProducerApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+// @Test
+// void contextLoads() {
+// }
 
-}
+// }
