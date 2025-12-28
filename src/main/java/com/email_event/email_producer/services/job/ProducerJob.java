@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.email_event.email_producer.models.EmailEvent;
-import com.email_event.email_producer.services.cache.EmailEventCacheService;
 import com.email_event.email_producer.services.events.EmailEventService;
 import com.email_event.email_producer.services.gmail.GmailScanService;
 
@@ -17,14 +16,14 @@ import com.email_event.email_producer.services.gmail.GmailScanService;
 public class ProducerJob {
     private static Logger log = LoggerFactory.getLogger(ProducerJob.class);
 
-    private EmailEventCacheService redisCache;
+    // private EmailEventCacheService redisCache;
     private EmailEventService kafkaService;
     private GmailScanService gmailService;
 
     @Autowired
-    public ProducerJob(EmailEventCacheService redisCache, EmailEventService kafkaService,
+    public ProducerJob(EmailEventService kafkaService,
             GmailScanService gmailService) {
-        this.redisCache = redisCache;
+        // this.redisCache = redisCache;
         this.kafkaService = kafkaService;
         this.gmailService = gmailService;
     }
@@ -33,11 +32,11 @@ public class ProducerJob {
     public void jobRunner() {
         var emailEvents = gmailService.readEmails();
         for (EmailEvent emailEvent : emailEvents) {
-            if (!redisCache.doesEmailEventAlreadyExist("me", emailEvent)) {
-                kafkaService.sendEmailEvent(emailEvent);
-            } else {
-                log.info("email event already in cache, not sending to kafka");
-            }
+            // if (!redisCache.doesEmailEventAlreadyExist("me", emailEvent)) {
+            kafkaService.sendEmailEvent(emailEvent.toString());
+            // } else {
+            // log.info("email event already in cache, not sending to kafka");
+            // }
         }
     }
 }
