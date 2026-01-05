@@ -1,7 +1,5 @@
 package com.email_event.email_producer.services.cache;
 
-import org.springframework.stereotype.Service;
-
 import com.email_event.email_producer.models.EmailEvent;
 
 public interface RedisEventInterface {

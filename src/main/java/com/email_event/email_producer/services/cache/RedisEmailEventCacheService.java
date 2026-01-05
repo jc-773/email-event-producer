@@ -6,21 +6,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
 
 import com.email_event.email_producer.models.EmailEvent;
+import com.email_event.email_producer.services.events.KafkaEventInterface;
 
-@Service
-public class EmailEventCacheService implements RedisEventInterface {
-    private static Logger log = LoggerFactory.getLogger(EmailEventCacheService.class);
+public class RedisEmailEventCacheService implements RedisEventInterface {
+    private static Logger log = LoggerFactory.getLogger(RedisEmailEventCacheService.class);
 
     private RedisTemplate<String, List<EmailEvent>> redisTemplate;
-    // private EmailEventService kafkaService;
+    private KafkaEventInterface kafkaService;
 
     @Autowired
-    public EmailEventCacheService(
+    public RedisEmailEventCacheService(KafkaEventInterface kafkaService,
             RedisTemplate<String, List<EmailEvent>> redisTemplate) {
-        // this.kafkaService = kafkaService;
+        this.kafkaService = kafkaService;
         this.redisTemplate = redisTemplate;
     }
 
@@ -39,7 +38,7 @@ public class EmailEventCacheService implements RedisEventInterface {
 
     public void handleEmailEvent(EmailEvent event) {
         if (!doesEmailEventExist(event)) {
-            // kafkaService.sendEmailEvent(event.getSubject());// TODO: Should send the
+            kafkaService.sendEmailEvent(event.getSubject());// TODO: Should send the
             // entire email event, but kafka is
             // setup to only send Strings not objects
             String messageId = event.getMessageId();
@@ -49,5 +48,4 @@ public class EmailEventCacheService implements RedisEventInterface {
             return;
         }
     }
-
 }

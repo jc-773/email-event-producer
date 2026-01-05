@@ -8,21 +8,22 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.email_event.email_producer.models.EmailEvent;
-import com.email_event.email_producer.services.cache.EmailEventCacheService;
 import com.email_event.email_producer.services.cache.RedisEventInterface;
-import com.email_event.email_producer.services.gmail.GmailScanService;
+import com.email_event.email_producer.services.gmail.GmailScanInterface;
 
 @EnableScheduling
 @Service
 public class ProducerJob {
     private static Logger log = LoggerFactory.getLogger(ProducerJob.class);
 
-    // private RedisEventInterface redisCache;
-    private GmailScanService gmailService;
+    // Loose coupling, focuses on the interface contract and not so much how it's
+    // done
+    private RedisEventInterface redisCache;
+    private GmailScanInterface gmailService;
 
     @Autowired
-    public ProducerJob(GmailScanService gmailService) {
-        // this.redisCache = redisCache;
+    public ProducerJob(RedisEventInterface redisCache, GmailScanInterface gmailService) {
+        this.redisCache = redisCache;
         this.gmailService = gmailService;
     }
 
@@ -32,7 +33,7 @@ public class ProducerJob {
     public void jobRunner() {
         var emailEvents = gmailService.readEmails();
         for (EmailEvent emailEvent : emailEvents) {
-            // redisCache.handleEmailEvent(emailEvent);
+            redisCache.handleEmailEvent(emailEvent);
         }
     }
 }

@@ -4,16 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Service;
 
-@Service
-public class EmailEventService implements KafkaEventInterface {
-    private static Logger log = LoggerFactory.getLogger(EmailEventService.class);
+public class KafkaEmailEventService implements KafkaEventInterface {
+    private static Logger log = LoggerFactory.getLogger(KafkaEmailEventService.class);
 
     private KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
-    public EmailEventService(KafkaTemplate<String, String> kafkaTemplate) {
+    public KafkaEmailEventService(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 

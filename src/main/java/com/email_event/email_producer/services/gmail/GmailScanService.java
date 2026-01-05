@@ -28,7 +28,7 @@ import com.google.api.services.gmail.model.ListMessagesResponse;
 import com.google.api.services.gmail.model.Message;
 
 @Service
-public class GmailScanService {
+public class GmailScanService implements GmailScanInterface {
     private static Logger log = LoggerFactory.getLogger(GmailScanService.class);
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_READONLY);

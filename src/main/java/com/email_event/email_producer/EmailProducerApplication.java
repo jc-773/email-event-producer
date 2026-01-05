@@ -20,7 +20,7 @@ import com.email_event.email_producer.services.job.ProducerJob;
 public class EmailProducerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ProducerJob.class, args);
+		SpringApplication.run(EmailProducerApplication.class, args);
 	}
 
 	@Bean
