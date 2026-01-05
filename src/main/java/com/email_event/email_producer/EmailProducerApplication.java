@@ -31,28 +31,4 @@ public class EmailProducerApplication {
 		};
 	}
 
-	@Bean
-	public RedisTemplate<String, List<EmailEvent>> redisTemplate(
-			RedisConnectionFactory factory) {
-
-		RedisTemplate<String, List<EmailEvent>> template = new RedisTemplate<>();
-		template.setConnectionFactory(factory);
-
-		// JacksonJsonRedisSerializer<List<EmailEvent>> serializer = new
-		// JacksonJsonRedisSerializer<>(
-		// objectMapper,
-		// new TypeReference<List<EmailEvent>>() {
-		// });
-
-		template.setKeySerializer(new StringRedisSerializer());
-		// template.setValueSerializer(serializer);
-
-		template.afterPropertiesSet();
-		return template;
-	}
-
-	@Bean
-	public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory factory) {
-		return new StringRedisTemplate(factory);
-	}
 }

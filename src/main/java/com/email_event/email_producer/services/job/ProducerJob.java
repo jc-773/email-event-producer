@@ -29,7 +29,7 @@ public class ProducerJob {
 
     // instead of an open stream, just poll every minute Gmail API is generously
     // cheap
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = " 0 */2 * * * *")
     public void jobRunner() {
         var emailEvents = gmailService.readEmails();
         for (EmailEvent emailEvent : emailEvents) {

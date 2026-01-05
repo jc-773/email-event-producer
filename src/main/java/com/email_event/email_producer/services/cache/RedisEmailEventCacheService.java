@@ -1,15 +1,18 @@
 package com.email_event.email_producer.services.cache;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
 import com.email_event.email_producer.models.EmailEvent;
 import com.email_event.email_producer.services.events.KafkaEventInterface;
 
+@Service
 public class RedisEmailEventCacheService implements RedisEventInterface {
     private static Logger log = LoggerFactory.getLogger(RedisEmailEventCacheService.class);
 
@@ -25,12 +28,14 @@ public class RedisEmailEventCacheService implements RedisEventInterface {
 
     @Override
     public boolean doesEmailEventExist(EmailEvent emailEvent) {
-        String toEmail = emailEvent.getTo();
-        var listOfEmailEvents = redisTemplate.opsForValue().get(toEmail);
-        for (EmailEvent event : listOfEmailEvents) {
-            if (event.getMessageId() == emailEvent.getMessageId())
-                return true;
+        String messageId = emailEvent.getMessageId();
+        var listOfEmailEvents = redisTemplate.opsForValue().get(messageId);
+        if (listOfEmailEvents != null) {
+            for (EmailEvent event : listOfEmailEvents) {
+                if (event.getMessageId() == emailEvent.getMessageId())
+                    return true;
 
+            }
         }
         return false;
 
@@ -43,6 +48,9 @@ public class RedisEmailEventCacheService implements RedisEventInterface {
             // setup to only send Strings not objects
             String messageId = event.getMessageId();
             var listOfEmailEvents = redisTemplate.opsForValue().get(messageId);
+            if (listOfEmailEvents == null)
+                listOfEmailEvents = new ArrayList<>();
+
             listOfEmailEvents.add(event);
             redisTemplate.opsForValue().set(event.getMessageId(), listOfEmailEvents);
             return;
