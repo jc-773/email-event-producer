@@ -1,67 +1,53 @@
-// package com.email_event.email_producer.services.cache;
+package com.email_event.email_producer.services.cache;
 
-// import java.time.Duration;
-// import java.util.ArrayList;
-// import java.util.List;
+import java.util.List;
 
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.data.redis.core.RedisTemplate;
-// import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
-// import com.email_event.email_producer.models.EmailEvent;
+import com.email_event.email_producer.models.EmailEvent;
 
-// @Service
-// public class EmailEventCacheService implements RedisEventInterface {
-// private static Logger log =
-// LoggerFactory.getLogger(EmailEventCacheService.class);
+@Service
+public class EmailEventCacheService implements RedisEventInterface {
+    private static Logger log = LoggerFactory.getLogger(EmailEventCacheService.class);
 
-// private Duration standardExpiry = Duration.ofDays(2);
-// private RedisTemplate<String, List<EmailEvent>> redisTemplate;
-// private List<EmailEvent> emailEvents;
+    private RedisTemplate<String, List<EmailEvent>> redisTemplate;
+    // private EmailEventService kafkaService;
 
-// @Autowired
-// public EmailEventCacheService(RedisTemplate<String, List<EmailEvent>>
-// redisTemplate) {
-// this.redisTemplate = redisTemplate;
-// this.emailEvents = new ArrayList<>();
-// }
+    @Autowired
+    public EmailEventCacheService(
+            RedisTemplate<String, List<EmailEvent>> redisTemplate) {
+        // this.kafkaService = kafkaService;
+        this.redisTemplate = redisTemplate;
+    }
 
-// @Override
-// public void saveEmailEventIfNotAlreadyPresent(String userId, EmailEvent
-// emailEvent) {
-// var emailEvents = redisTemplate.opsForValue().get(userId);
-// if (!emailEvents.contains(emailEvent)) {
-// emailEvents.add(emailEvent);
-// redisTemplate.opsForValue().set(userId, emailEvents, standardExpiry);
-// }
-// emailEvents.add(emailEvent);
-// }
+    @Override
+    public boolean doesEmailEventExist(EmailEvent emailEvent) {
+        String toEmail = emailEvent.getTo();
+        var listOfEmailEvents = redisTemplate.opsForValue().get(toEmail);
+        for (EmailEvent event : listOfEmailEvents) {
+            if (event.getMessageId() == emailEvent.getMessageId())
+                return true;
 
-// @Override
-// public List<EmailEvent> getEmailEventsForUser(String userId) {
-// return redisTemplate.opsForValue().get(userId);
-// }
+        }
+        return false;
 
-// @Override
-// public boolean doesEmailEventAlreadyExist(String userId, EmailEvent
-// emailEvent) {
-// log.info("checking if email event-{} exists in cache",
-// emailEvent.getMessageId());
-// List<EmailEvent> list = redisTemplate.opsForValue().get(userId);
-// if (list != null) {
-// for (EmailEvent event : list) {
-// if (emailEvent.getMessageId().equals(event.getMessageId())) {
-// log.info("found email event in the cache at messageId—{}",
-// emailEvent.getMessageId());
-// return true;
-// }
-// }
-// } else {
-// emailEvents.add(emailEvent);
-// redisTemplate.opsForValue().set(userId, emailEvents, standardExpiry);
-// }
-// return false;
-// }
-// }
+    }
+
+    public void handleEmailEvent(EmailEvent event) {
+        if (!doesEmailEventExist(event)) {
+            // kafkaService.sendEmailEvent(event.getSubject());// TODO: Should send the
+            // entire email event, but kafka is
+            // setup to only send Strings not objects
+            String messageId = event.getMessageId();
+            var listOfEmailEvents = redisTemplate.opsForValue().get(messageId);
+            listOfEmailEvents.add(event);
+            redisTemplate.opsForValue().set(event.getMessageId(), listOfEmailEvents);
+            return;
+        }
+    }
+
+}

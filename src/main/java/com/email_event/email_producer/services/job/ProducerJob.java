@@ -8,7 +8,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.email_event.email_producer.models.EmailEvent;
-import com.email_event.email_producer.services.events.EmailEventService;
+import com.email_event.email_producer.services.cache.EmailEventCacheService;
+import com.email_event.email_producer.services.cache.RedisEventInterface;
 import com.email_event.email_producer.services.gmail.GmailScanService;
 
 @EnableScheduling
@@ -16,27 +17,22 @@ import com.email_event.email_producer.services.gmail.GmailScanService;
 public class ProducerJob {
     private static Logger log = LoggerFactory.getLogger(ProducerJob.class);
 
-    // private EmailEventCacheService redisCache;
-    private EmailEventService kafkaService;
+    // private RedisEventInterface redisCache;
     private GmailScanService gmailService;
 
     @Autowired
-    public ProducerJob(EmailEventService kafkaService,
-            GmailScanService gmailService) {
+    public ProducerJob(GmailScanService gmailService) {
         // this.redisCache = redisCache;
-        this.kafkaService = kafkaService;
         this.gmailService = gmailService;
     }
 
+    // instead of an open stream, just poll every minute Gmail API is generously
+    // cheap
     @Scheduled(cron = "0 * * * * *")
     public void jobRunner() {
         var emailEvents = gmailService.readEmails();
         for (EmailEvent emailEvent : emailEvents) {
-            // if (!redisCache.doesEmailEventAlreadyExist("me", emailEvent)) {
-            kafkaService.sendEmailEvent(emailEvent.toString());
-            // } else {
-            // log.info("email event already in cache, not sending to kafka");
-            // }
+            // redisCache.handleEmailEvent(emailEvent);
         }
     }
 }

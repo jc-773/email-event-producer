@@ -19,7 +19,8 @@ public class EmailEventService implements KafkaEventInterface {
 
     @Override
     public void sendEmailEvent(String emailEvent) {
-        kafkaTemplate.send("email-event", emailEvent);
-        log.info("email event sent to kafka topic");
+        // var list = List.of(emailEvent);
+        // kafkaTemplate.send("email-event", list);
+        // log.info("email event sent to kafka topic");
     }
 }
