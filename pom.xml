@@ -86,6 +86,11 @@
 			<artifactId>spring-boot-starter-json</artifactId>
 			<version>4.0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.18.2</version>
+		</dependency>
 
 		<!-- Kafka -->
 		<dependency>

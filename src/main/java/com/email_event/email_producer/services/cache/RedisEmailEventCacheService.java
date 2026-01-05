@@ -43,9 +43,7 @@ public class RedisEmailEventCacheService implements RedisEventInterface {
 
     public void handleEmailEvent(EmailEvent event) {
         if (!doesEmailEventExist(event)) {
-            kafkaService.sendEmailEvent(event.getSubject());// TODO: Should send the
-            // entire email event, but kafka is
-            // setup to only send Strings not objects
+            kafkaService.sendEmailEvent(event);
             String messageId = event.getMessageId();
             var listOfEmailEvents = redisTemplate.opsForValue().get(messageId);
             if (listOfEmailEvents == null)

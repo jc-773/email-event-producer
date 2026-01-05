@@ -22,7 +22,6 @@ import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 @Configuration
 public class RedisConfig {
 
-    // ... inside your @Bean method
     @Bean
     public RedisTemplate<String, List<EmailEvent>> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, List<EmailEvent>> template = new RedisTemplate<>();
@@ -30,14 +29,12 @@ public class RedisConfig {
 
         template.setKeySerializer(new StringRedisSerializer());
 
-        // 1. Define the Validator (Security check for storing class names)
         BasicPolymorphicTypeValidator validator = BasicPolymorphicTypeValidator.builder()
                 .allowIfBaseType(Object.class)
                 .build();
 
-        // 2. Build the Jackson 3 Mapper
-        // Note: findAndRegisterModules() is NOT needed; Java 25 dates work out of the
-        // box.
+        // JAckson 3 mapper... this will add the type to Redis so that object mapper
+        // knows what to serialize it to
         ObjectMapper mapper = JsonMapper.builder()
                 .activateDefaultTyping(
                         validator,
@@ -45,7 +42,6 @@ public class RedisConfig {
                         JsonTypeInfo.As.PROPERTY)
                 .build();
 
-        // 3. Use the mapper
         var serializer = new GenericJacksonJsonRedisSerializer(mapper);
 
         template.setValueSerializer(serializer);

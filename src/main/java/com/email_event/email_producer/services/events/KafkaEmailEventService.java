@@ -6,21 +6,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import com.email_event.email_producer.models.EmailEvent;
+
 @Service
 public class KafkaEmailEventService implements KafkaEventInterface {
     private static Logger log = LoggerFactory.getLogger(KafkaEmailEventService.class);
 
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaTemplate<String, EmailEvent> kafkaTemplate;
 
     @Autowired
-    public KafkaEmailEventService(KafkaTemplate<String, String> kafkaTemplate) {
+    public KafkaEmailEventService(KafkaTemplate<String, EmailEvent> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
     @Override
-    public void sendEmailEvent(String emailEvent) {
-        // var list = List.of(emailEvent);
-        // kafkaTemplate.send("email-event", list);
-        // log.info("email event sent to kafka topic");
+    public void sendEmailEvent(EmailEvent emailEvent) {
+        kafkaTemplate.send("email-event", emailEvent);
+        log.info("email event sent to kafka topic");
     }
 }
